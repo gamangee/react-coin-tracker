@@ -12,16 +12,16 @@ const router = createBrowserRouter([
   {
     path: '/:coinId',
     element: <Coin />,
-    // children: [
-    //   {
-    //     path: '/price',
-    //     element: <Price />,
-    //   },
-    //   {
-    //     path: '/chart',
-    //     element: <Chart />,
-    //   },
-    // ],
+    children: [
+      {
+        path: 'price',
+        element: <Price />,
+      },
+      {
+        path: 'chart',
+        element: <Chart />,
+      },
+    ],
   },
 ]);
 

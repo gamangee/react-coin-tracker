@@ -1,13 +1,19 @@
 import { useState, useEffect } from 'react';
-import { useLocation, useParams } from 'react-router-dom';
+import {
+  Link,
+  Outlet,
+  useLocation,
+  useParams,
+  useMatch,
+} from 'react-router-dom';
 import styled from 'styled-components';
 
-interface Params {
-  coinId: string;
-}
+// interface Params {
+//   coinId: string;
+// }
 
 interface RouteState {
-  name: string;
+  state: { name: string };
 }
 
 interface InfoData {
@@ -66,11 +72,13 @@ interface PriceData {
 }
 
 export default function Coin() {
-  const { coinId } = useParams();
+  const { coinId } = useParams() as { coinId: string };
   const [loading, setLoading] = useState(true);
-  const { state } = useLocation();
+  const { state } = useLocation() as RouteState;
   const [info, setInfo] = useState<InfoData>();
   const [priceInfo, setPriceInfo] = useState<PriceData>();
+  const matchPriceTab = useMatch('/:coinId/price');
+  const matchChartTab = useMatch('/:coinId/chart');
 
   useEffect(() => {
     (async () => {
@@ -85,6 +93,9 @@ export default function Coin() {
       setLoading(false);
     })();
   }, [coinId]);
+
+  console.log(state);
+  console.log(matchPriceTab);
 
   return (
     <Container>
@@ -114,6 +125,15 @@ export default function Coin() {
               <span>Max Suply: {priceInfo?.max_supply}</span>
             </div>
           </div>
+          <Tabs>
+            <Tab isActive={matchChartTab !== null}>
+              <Link to={`/${coinId}/chart`}>Chart</Link>
+            </Tab>
+            <Tab isActive={matchPriceTab !== null}>
+              <Link to={`/${coinId}/price`}>Price</Link>
+            </Tab>
+          </Tabs>
+          <Outlet />
         </>
       )}
     </Container>
@@ -141,4 +161,26 @@ const Header = styled.header`
 const Title = styled.h1`
   color: ${(props) => props.theme.accentColor};
   font-size: 48px;
+`;
+
+const Tabs = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  margin: 25px 0px;
+  gap: 10px;
+`;
+
+const Tab = styled.span<{ isActive: boolean }>`
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 400;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 7px 0px;
+  border-radius: 10px;
+  color: ${(props) =>
+    props.isActive ? props.theme.accentColor : props.theme.textColor};
+  a {
+    display: block;
+  }
 `;
