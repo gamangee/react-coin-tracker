@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 // import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { fetchCoins } from '../api';
+// import { fetchCoins } from '../api';
 
 export default function Coins() {
   const [coins, setCoins] = useState<CoinInterface[]>([]);
@@ -33,7 +33,9 @@ export default function Coins() {
         <CoinsList>
           {coins?.slice(0, 50).map((coin) => (
             <Coin key={coin.id}>
-              <Link to={`/${coin.id}`} state={{ name: coin.name }}>
+              <Link
+                to={{ pathname: `/${coin.id}`, state: { name: coin.name } }}
+              >
                 <Img
                   src={`https://cryptocurrencyliveprices.com/img/${coin.id}.png`}
                   alt='icon_img'
