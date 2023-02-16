@@ -1,11 +1,5 @@
 import { useState, useEffect } from 'react';
-import {
-  Link,
-  Outlet,
-  useLocation,
-  useParams,
-  useMatch,
-} from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 
 // interface Params {
@@ -77,8 +71,6 @@ export default function Coin() {
   const { state } = useLocation() as RouteState;
   const [info, setInfo] = useState<InfoData>();
   const [priceInfo, setPriceInfo] = useState<PriceData>();
-  const matchPriceTab = useMatch('/:coinId/price');
-  const matchChartTab = useMatch('/:coinId/chart');
 
   useEffect(() => {
     (async () => {
@@ -93,9 +85,6 @@ export default function Coin() {
       setLoading(false);
     })();
   }, [coinId]);
-
-  console.log(state);
-  console.log(matchPriceTab);
 
   return (
     <Container>
@@ -125,15 +114,6 @@ export default function Coin() {
               <span>Max Suply: {priceInfo?.max_supply}</span>
             </div>
           </div>
-          <Tabs>
-            <Tab isActive={matchChartTab !== null}>
-              <Link to={`/${coinId}/chart`}>Chart</Link>
-            </Tab>
-            <Tab isActive={matchPriceTab !== null}>
-              <Link to={`/${coinId}/price`}>Price</Link>
-            </Tab>
-          </Tabs>
-          <Outlet />
         </>
       )}
     </Container>
