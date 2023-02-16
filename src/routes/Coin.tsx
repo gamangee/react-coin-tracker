@@ -1,10 +1,21 @@
-import { useState, useEffect } from 'react';
-import { useLocation, useParams } from 'react-router-dom';
+// import { useState, useEffect } from 'react';
+import {
+  Link,
+  Route,
+  Switch,
+  useLocation,
+  useParams,
+  useRouteMatch,
+} from 'react-router-dom';
+import { useQuery } from 'react-query';
+import { fetchCoinInfo, fetchCoinTickers } from '../api';
+import Chart from './Chart';
+import Price from './Price';
 import styled from 'styled-components';
 
-// interface Params {
-//   coinId: string;
-// }
+interface Params {
+  coinId: string;
+}
 
 interface RouteState {
   state: { name: string };
@@ -66,25 +77,39 @@ interface PriceData {
 }
 
 export default function Coin() {
-  const { coinId } = useParams() as { coinId: string };
-  const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(true);
+  // const [info, setInfo] = useState<InfoData>();
+  // const [priceInfo, setPriceInfo] = useState<PriceData>();
+  const { coinId } = useParams<Params>();
   const { state } = useLocation() as RouteState;
-  const [info, setInfo] = useState<InfoData>();
-  const [priceInfo, setPriceInfo] = useState<PriceData>();
+  const priceMatch = useRouteMatch('/:coinId/price');
+  const chartMatch = useRouteMatch('/:coinId/chart');
 
-  useEffect(() => {
-    (async () => {
-      const infoData = await (
-        await fetch(`https://api.coinpaprika.com/v1/coins/${coinId}`)
-      ).json();
-      const priceData = await await (
-        await fetch(`https://api.coinpaprika.com/v1/tickers/${coinId}`)
-      ).json();
-      setInfo(infoData);
-      setPriceInfo(priceData);
-      setLoading(false);
-    })();
-  }, [coinId]);
+  // useEffect(() => {
+  //   (async () => {
+  //     const infoData = await (
+  //       await fetch(`https://api.coinpaprika.com/v1/coins/${coinId}`)
+  //     ).json();
+  //     const priceData = await await (
+  //       await fetch(`https://api.coinpaprika.com/v1/tickers/${coinId}`)
+  //     ).json();
+  //     setInfo(infoData);
+  //     setPriceInfo(priceData);
+  //     setLoading(false);
+  //   })();
+  // }, [coinId]);
+
+  const { isLoading: infoLoading, data: infoData } = useQuery<InfoData>(
+    ['info', coinId],
+    () => fetchCoinInfo(coinId)
+  );
+
+  const { isLoading: tickersLoading, data: tickersData } = useQuery<PriceData>(
+    ['tickers', coinId],
+    () => fetchCoinTickers(coinId)
+  );
+
+  const loading = infoLoading || tickersLoading;
 
   return (
     <Container>
@@ -96,24 +121,40 @@ export default function Coin() {
         <>
           <div>
             <div>
-              <span>Rank:{info?.rank}</span>
+              <span>Rank:{infoData?.rank}</span>
             </div>
             <div>
-              <span>Symbol: ${info?.symbol}</span>
+              <span>Symbol: ${infoData?.symbol}</span>
             </div>
             <div>
-              <span>Open Source: {info?.open_source ? 'Yes' : 'No'}</span>
+              <span>Open Source: {infoData?.open_source ? 'Yes' : 'No'}</span>
             </div>
-            <div>{info?.description}</div>
+            <div>{infoData?.description}</div>
           </div>
           <div>
             <div>
-              <span>Total Suply: {priceInfo?.total_supply}</span>
+              <span>Total Suply: {tickersData?.total_supply}</span>
             </div>
             <div>
-              <span>Max Suply: {priceInfo?.max_supply}</span>
+              <span>Max Suply: {tickersData?.max_supply}</span>
             </div>
           </div>
+          <Tabs>
+            <Tab isActive={chartMatch !== null}>
+              <Link to={`/${coinId}/chart`}>Chart</Link>
+            </Tab>
+            <Tab isActive={priceMatch !== null}>
+              <Link to={`/${coinId}/price`}>Price</Link>
+            </Tab>
+          </Tabs>
+          <Switch>
+            <Route path={`/coinId/price`}>
+              <Price />
+            </Route>
+            <Route path={`/coinId/chart`}>
+              <Chart />
+            </Route>
+          </Switch>
         </>
       )}
     </Container>
@@ -141,4 +182,26 @@ const Header = styled.header`
 const Title = styled.h1`
   color: ${(props) => props.theme.accentColor};
   font-size: 48px;
+`;
+
+const Tabs = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  margin: 25px 0px;
+  gap: 10px;
+`;
+
+const Tab = styled.span<{ isActive: boolean }>`
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 400;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 7px 0px;
+  border-radius: 10px;
+  color: ${(props) =>
+    props.isActive ? props.theme.accentColor : props.theme.textColor};
+  a {
+    display: block;
+  }
 `;

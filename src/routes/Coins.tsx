@@ -1,26 +1,26 @@
-import { useState, useEffect } from 'react';
-// import { useQuery } from '@tanstack/react-query';
+// import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useQuery } from 'react-query';
+import { fetchCoins } from '../api';
 import styled from 'styled-components';
-// import { fetchCoins } from '../api';
 
 export default function Coins() {
-  const [coins, setCoins] = useState<CoinInterface[]>([]);
-  const [loading, setLoading] = useState(true);
+  // const [coins, setCoins] = useState<CoinInterface[]>([]);
+  // const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    (async () => {
-      const response = await fetch('https://api.coinpaprika.com/v1/coins');
-      const json = await response.json();
-      setCoins(json.slice(0, 50));
-      setLoading(false);
-    })();
-  }, []);
+  // useEffect(() => {
+  //   (async () => {
+  //     const response = await fetch('https://api.coinpaprika.com/v1/coins');
+  //     const json = await response.json();
+  //     setCoins(json.slice(0, 50));
+  //     setLoading(false);
+  //   })();
+  // }, []);
 
-  // const { isLoading: loading, data: coins } = useQuery<CoinInterface[]>(
-  //   ['allCoins'],
-  //   fetchCoins
-  // );
+  const { isLoading: loading, data: coins } = useQuery<CoinInterface[]>(
+    'allCoins',
+    fetchCoins
+  );
 
   return (
     <Container>
