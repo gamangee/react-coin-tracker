@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useQuery } from 'react-query';
 import { fetchCoins } from '../api';
 import styled from 'styled-components';
+import { Helmet } from 'react-helmet';
 
 export default function Coins() {
   // const [coins, setCoins] = useState<CoinInterface[]>([]);
@@ -24,6 +25,9 @@ export default function Coins() {
 
   return (
     <Container>
+      <Helmet>
+        <title>COIN</title>
+      </Helmet>
       <Header>
         <Title>coin</Title>
       </Header>
