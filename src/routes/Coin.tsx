@@ -110,7 +110,7 @@ export default function Coin() {
   );
 
   const loading = infoLoading || tickersLoading;
-
+  console.log(coinId);
   return (
     <Container>
       <Header>
@@ -148,11 +148,11 @@ export default function Coin() {
             </Tab>
           </Tabs>
           <Switch>
-            <Route path={`/coinId/price`}>
+            <Route path={`/:coinId/price`}>
               <Price />
             </Route>
-            <Route path={`/coinId/chart`}>
-              <Chart />
+            <Route path='/:coinId/chart'>
+              <Chart coinId={coinId} />
             </Route>
           </Switch>
         </>
